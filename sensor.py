@@ -4,9 +4,10 @@ For more details about this component, please refer to the documentation at
 https://github.com/oridestomkiel/home-assistant-correios
 """
 
-import json
 import logging
 import async_timeout
+from bs4 import BeautifulSoup
+import datetime
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.entity import DeviceInfo
@@ -14,7 +15,6 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import device_registry as dr
-from correios import extrair_dados_correios
 
 import json
 from .const import (
@@ -26,6 +26,18 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+icons = {
+    "Objeto postado após o horário limite da unidade": "https://rastreamento.correios.com.br/static/rastreamento-internet/imgs/novos/agencia-relogio-stroke.svg",
+    "Objeto em transferência - por favor aguarde": "https://rastreamento.correios.com.br/static/rastreamento-internet/imgs/novos/caminhao-correndo-stroke.svg",
+    "Sua entrega ou retirada nos Correios pode levar mais tempo do que o previsto": "https://rastreamento.correios.com.br/static/rastreamento-internet/imgs/novos/agencia-exclamacao-stroke.svg",
+    "Objeto saiu para entrega ao destinatário": "https://rastreamento.correios.com.br/static/rastreamento-internet/imgs/novos/caminhao-correndo-stroke.svg",
+    "Objeto entregue ao destinatário": "https://rastreamento.correios.com.br/static/rastreamento-internet/imgs/novos/caixa-visto-stroke.svg",
+    "Objeto aguardando retirada no endereço indicado": "https://rastreamento.correios.com.br/static/rastreamento-internet/imgs/novos/agencia-relogio-stroke.svg",
+    "Objeto não entregue - prazo de retirada encerrado": "https://rastreamento.correios.com.br/static/rastreamento-internet/imgs/novos/caixa-voltar-stroke.svg",
+    "Informações enviadas para análise da autoridade aduaneira/órgãos anuentes": "https://rastreamento.correios.com.br/static/rastreamento-internet/imgs/novos/documento-encaminhar-stroke.svg",
+    "default": "https://rastreamento.correios.com.br/static/rastreamento-internet/imgs/correios-sf.png"
+}
 
 
 async def async_setup_entry(
@@ -41,6 +53,71 @@ async def async_setup_entry(
         [CorreiosSensor(track, entry.entry_id, name, description, session)],
         True,
     )
+
+async def extrair_dados_correios(url, session):
+    """Extrai dados de rastreamento dos Correios a partir de um ID.
+
+    Args:
+        url (str): URL completa da página de rastreamento.
+
+    Returns:
+        dict: Dicionário contendo os dados extraídos, ou None se não encontrados.
+    """
+
+    try:
+        response = await session.get(url)
+        info = await response.text()
+
+        soup = BeautifulSoup(info, 'html.parser')
+
+        # Encontra o elemento div com a classe 'accordion_2'
+        accordion = soup.find('div', class_='accordion_2')
+
+        if accordion:
+            # Encontra o elemento ul com a classe 'linha_status'
+            linha_status = accordion.find('ul', class_='linha_status')
+
+            if linha_status:
+                # Extrai o status
+                status = linha_status.find('b').text.strip()
+
+                # Lista para armazenar os dados
+                dados = {'status': status}
+
+                # Verifica se o status indica "Objeto em transferência"
+                if "Objeto em transferência" in status:
+                    origem = linha_status.find_all('li')[2].text.strip()
+                    destino = linha_status.find_all('li')[3].text.strip()
+                    dados['origem'] = origem
+                    dados['destino'] = destino
+                else:
+                    local = linha_status.find_all('li')[2].text.strip()
+                    dados['local'] = local
+                
+                # Caso contrário, extrai os dados de "Data", "Hora" e "Local"
+                data_hora = linha_status.find_all('li')[1].text.strip()
+                data, hora = data_hora.split(' | ')
+                hora = hora.replace('Hora:', '').strip()
+
+                try:
+                    data_formatada = datetime.datetime.strptime(data[8:], '%d/%m/%Y').strftime('%d/%m')
+                    hora_formatada = datetime.datetime.strptime(hora, '%H:%M').strftime('%H:%M')
+                    dados['data'] = data_formatada
+                    dados['hora'] = hora_formatada
+                except ValueError:
+                    _LOGGER.info("Formato de data ou hora inválido.")
+                    return None
+
+                return dados
+            else:
+                _LOGGER.info("Elemento 'linha_status' não encontrado.")
+        else:
+            _LOGGER.info("Elemento 'accordion_2' não encontrado.")
+
+    except requests.exceptions.RequestException as e:
+        _LOGGER.info(f"Erro na requisição: {e}")
+
+    return {'status': 'Objeto não encontrado', 'data': '', 'hora': '', 'local': ''}
 
 
 class CorreiosSensor(SensorEntity):
@@ -67,7 +144,6 @@ class CorreiosSensor(SensorEntity):
 
         self._attr_device_info = DeviceInfo(
             entry_type=dr.DeviceEntryType.SERVICE,
-            config_entry_id=config_entry_id,
             connections=None,
             identifiers={(DOMAIN, track)},
             manufacturer="Correios",
@@ -81,26 +157,22 @@ class CorreiosSensor(SensorEntity):
         try:
             url = BASE_API.format(self.track)
             async with async_timeout.timeout(3000):
-                data = await extrair_dados_correios(url)
+                data = await extrair_dados_correios(url, self.session)
 
-                if data["status"]:
+                self._image = icons["default"]
+
+                if 'status' in data:
                     self._state = data["status"]
                     self.data_movimentacao = f'{data["data"]} às {data["hora"]}'
 
-                    if data["origem"]:
+                    if 'origem' in data:
                         self.origem = data["origem"]
                         self.destino = data["destino"]
                     else:
                         self.local = data["local"]
 
-
-                f = open('data.json')
-                icons = json.load(f)
-
-                if icons[data["status"]]:
-                    self._image = icons[data["status"]]
-                else:
-                    self._image = icons["default"]
+                    if data["status"] in icons:
+                        self._image = icons[data["status"]]
 
         except Exception as error:
             _LOGGER.error("ERRO - Não foi possível atualizar - %s", error)
