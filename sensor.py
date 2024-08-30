@@ -91,7 +91,7 @@ async def extrair_dados_correios(url, session):
                     dados['origem'] = origem
                     dados['destino'] = destino
                 else:
-                    local = linha_status.find_all('li')[2].text.strip()
+                    local = linha_status.find_all('li')[2].text.strip().replace('Local: ', '')
                     dados['local'] = local
                 
                 # Caso contrário, extrai os dados de "Data", "Hora" e "Local"
