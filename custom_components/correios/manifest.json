@@ -7,7 +7,7 @@
   "codeowners": [
     "@oridestomkiel"
   ],
-  "requirements": [],
+  "requirements": ["requests", "beautifulsoup4"],
   "iot_class": "cloud_polling",
   "config_flow": true
 }
