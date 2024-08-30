@@ -28,15 +28,15 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 icons = {
-    "Objeto postado após o horário limite da unidade": "https://rastreamento.correios.com.br/static/rastreamento-internet/imgs/novos/agencia-relogio-stroke.svg",
-    "Objeto em transferência - por favor aguarde": "https://rastreamento.correios.com.br/static/rastreamento-internet/imgs/novos/caminhao-correndo-stroke.svg",
+    "Objeto postado após o horário limite da unidade": "https://meucorreios.correios.com.br/app/img/ic_busca-agencia.svg",
+    "Objeto em transferência - por favor aguarde": "https://cdn-icons-png.flaticon.com/512/3900/3900465.png",
     "Sua entrega ou retirada nos Correios pode levar mais tempo do que o previsto": "https://rastreamento.correios.com.br/static/rastreamento-internet/imgs/novos/agencia-exclamacao-stroke.svg",
-    "Objeto saiu para entrega ao destinatário": "https://rastreamento.correios.com.br/static/rastreamento-internet/imgs/novos/caminhao-correndo-stroke.svg",
-    "Objeto entregue ao destinatário": "https://rastreamento.correios.com.br/static/rastreamento-internet/imgs/novos/caixa-visto-stroke.svg",
-    "Objeto aguardando retirada no endereço indicado": "https://rastreamento.correios.com.br/static/rastreamento-internet/imgs/novos/agencia-relogio-stroke.svg",
-    "Objeto não entregue - prazo de retirada encerrado": "https://rastreamento.correios.com.br/static/rastreamento-internet/imgs/novos/caixa-voltar-stroke.svg",
-    "Informações enviadas para análise da autoridade aduaneira/órgãos anuentes": "https://rastreamento.correios.com.br/static/rastreamento-internet/imgs/novos/documento-encaminhar-stroke.svg",
-    "default": "https://rastreamento.correios.com.br/static/rastreamento-internet/imgs/correios-sf.png"
+    "Objeto saiu para entrega ao destinatário": "https://www.correios.com.br/ppn/imagens/receber-encomenda-cor.png/@@images/1c269676-de1c-455e-a7f6-bfaec7e263cf.png",
+    "Objeto entregue ao destinatário": "https://www.correios.com.br/atendimento/ferramentas/aplicativo-dos-correios/imagens/caixa-gps-cor.png",
+    "Objeto aguardando retirada no endereço indicado": "https://meucorreios.correios.com.br/app/img/ic_busca-agencia.svg",
+    "Objeto não entregue - prazo de retirada encerrado": "https://www.correios.com.br/ppn/imagens/locker-1.png/@@images/aab4e975-d3de-4879-98da-f288be7bcea7.png",
+    "Informações enviadas para análise da autoridade aduaneira/órgãos anuentes": "https://www.correios.com.br/ppn/imagens/contrato-cor/@@images/e04dde03-88eb-4f1e-a350-23e5e030bb50.png",
+    "default": "https://www.correios.com.br/++theme++tema-do-portal-correios/static/imagens/ic-personalizados/busca-cor.svg"
 }
 
 
