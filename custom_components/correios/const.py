@@ -13,5 +13,4 @@ CONF_DESCRIPTION = "description"
 DEFAULT_DESCRIPTION: Final = "Encomenda"
 
 ICON = "mdi:box-variant-closed"
-BASE_API = "https://proxyapp.correios.com.br/v1/sro-rastro/{}"
-BASE_URL = "https://proxyapp.correios.com.br"
+BASE_API = "https://www.linkcorreios.com.br/?id={}"
