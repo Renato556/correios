@@ -14,7 +14,7 @@
 
 3. Copie os ícones:
     ```bash
-    cp -r icons /config/www
+    cd correios && cp -r icons /config/www
 
 4. Reinicie o Home Assistant
 
