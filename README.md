@@ -1,4 +1,4 @@
-## Atualização da Integração dos Correios para o site linkcorreios
+## Rastreio de encomendas utilizando o site linkcorreios
 
 **Devido à desativação da antiga API dos Correios, este repositório oferece uma atualização para que a integração passe a utilizar o site linkcorreios.**
 
