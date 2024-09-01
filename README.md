@@ -4,7 +4,7 @@
 
 ### Instalação
 
-1. **Navegue até o diretório:**
+1. Navegue até o diretório:
    ```bash
    cd /homeassistant/custom_components
 
