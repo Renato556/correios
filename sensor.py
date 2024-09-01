@@ -1,6 +1,8 @@
 """
 A platform that provides information about the tracking of objects in the post office in Brazil
 For more details about this component, please refer to the documentation at
+https://github.com/Renato556/correios
+a fork of
 https://github.com/oridestomkiel/home-assistant-correios
 """
 
@@ -44,7 +46,6 @@ icons = {
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    """Set up Tuya sensor dynamically through Tuya discovery."""
     track = entry.data[CONF_TRACKING]
     description = entry.data[CONF_DESCRIPTION]
     session = async_create_clientsession(hass)
@@ -56,36 +57,22 @@ async def async_setup_entry(
     )
 
 async def extrair_dados_correios(url, session):
-    """Extrai dados de rastreamento dos Correios a partir de um ID.
-
-    Args:
-        url (str): URL completa da página de rastreamento.
-
-    Returns:
-        dict: Dicionário contendo os dados extraídos, ou None se não encontrados.
-    """
-
     try:
         response = await session.get(url)
         info = await response.text()
 
         soup = BeautifulSoup(info, 'html.parser')
 
-        # Encontra o elemento div com a classe 'accordion_2'
         accordion = soup.find('div', class_='accordion_2')
 
         if accordion:
-            # Encontra o elemento ul com a classe 'linha_status'
             linha_status = accordion.find('ul', class_='linha_status')
 
             if linha_status:
-                # Extrai o status
                 status = linha_status.find('b').text.strip()
 
-                # Lista para armazenar os dados
                 dados = {'status': status}
 
-                # Verifica se o status indica "Objeto em transferência"
                 if "Objeto em transferência" in status:
                     origem = linha_status.find_all('li')[2].text.strip()
                     destino = linha_status.find_all('li')[3].text.strip()
@@ -95,28 +82,27 @@ async def extrair_dados_correios(url, session):
                     local = linha_status.find_all('li')[2].text.strip().replace('Local: ', '')
                     dados['local'] = local
                 
-                # Caso contrário, extrai os dados de "Data", "Hora" e "Local"
                 data_hora = linha_status.find_all('li')[1].text.strip()
-                data, hora = data_hora.split(' | ')
+                data, hora = data_hora.replace('Data : ', '').split(' | ')
                 hora = hora.replace('Hora:', '').strip()
 
                 try:
-                    data_formatada = datetime.datetime.strptime(data[8:], '%d/%m/%Y').strftime('%d/%m')
+                    data_formatada = datetime.datetime.strptime(data, '%d/%m/%Y').strftime('%d/%m')
                     hora_formatada = datetime.datetime.strptime(hora, '%H:%M').strftime('%H:%M')
                     dados['data'] = data_formatada
                     dados['hora'] = hora_formatada
                 except ValueError:
-                    _LOGGER.info("Formato de data ou hora inválido.")
+                    _LOGGER.error("Formato de data ou hora inválido.")
                     return None
 
                 return dados
             else:
-                _LOGGER.info("Elemento 'linha_status' não encontrado.")
+                _LOGGER.error("Elemento 'linha_status' não encontrado.")
         else:
-            _LOGGER.info("Elemento 'accordion_2' não encontrado.")
+            _LOGGER.error("Elemento 'accordion_2' não encontrado.")
 
-    except requests.exceptions.RequestException as e:
-        _LOGGER.info(f"Erro na requisição: {e}")
+    except Exception as e:
+        _LOGGER.error(f"Erro na requisição: {e}")
 
     return {'status': 'Objeto não encontrado', 'data': '', 'hora': '', 'local': ''}
 
