@@ -9,7 +9,7 @@ https://github.com/oridestomkiel/home-assistant-correios
 import logging
 import async_timeout
 from bs4 import BeautifulSoup
-import datetime
+from datetime import datetime
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.entity import DeviceInfo
@@ -18,7 +18,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import device_registry as dr
 
-import json
 from .const import (
     BASE_API,
     CONF_TRACKING,
@@ -88,8 +87,8 @@ async def extrair_dados_correios(url, session):
                 hora = hora.replace('Hora:', '').strip()
 
                 try:
-                    data_formatada = datetime.datetime.strptime(data, '%d/%m/%Y').strftime('%d/%m')
-                    hora_formatada = datetime.datetime.strptime(hora, '%H:%M').strftime('%H:%M')
+                    data_formatada = datetime.strptime(data, '%d/%m/%Y').strftime('%d/%m')
+                    hora_formatada = datetime.strptime(hora, '%H:%M').strftime('%H:%M')
                     dados['data'] = data_formatada
                     dados['hora'] = hora_formatada
                 except ValueError as e:
