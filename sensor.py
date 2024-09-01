@@ -83,7 +83,8 @@ async def extrair_dados_correios(url, session):
                     dados['local'] = local
                 
                 data_hora = linha_status.find_all('li')[1].text.strip()
-                data, hora = data_hora.replace('Data : ', '').split(' | ')
+                data, hora = data_hora.split(' | ')
+                data = data.replace('Data', '').replace(':', '').strip()
                 hora = hora.replace('Hora:', '').strip()
 
                 try:
@@ -91,8 +92,8 @@ async def extrair_dados_correios(url, session):
                     hora_formatada = datetime.datetime.strptime(hora, '%H:%M').strftime('%H:%M')
                     dados['data'] = data_formatada
                     dados['hora'] = hora_formatada
-                except ValueError:
-                    _LOGGER.error("Formato de data ou hora inválido.")
+                except ValueError as e:
+                    _LOGGER.error(f"Formato de data ou hora inválido: {e}")
                     return None
 
                 return dados
