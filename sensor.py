@@ -99,12 +99,12 @@ async def extrair_dados_correios(url, session):
             else:
                 _LOGGER.error("Elemento 'linha_status' não encontrado.")
         else:
-            _LOGGER.error("Elemento 'accordion_2' não encontrado.")
+            _LOGGER.warn("Elemento 'accordion_2' não encontrado.")
 
     except Exception as e:
         _LOGGER.error(f"Erro na requisição: {e}")
 
-    return {'status': 'Objeto não encontrado', 'data': '', 'hora': '', 'local': ''}
+    return None
 
 
 class CorreiosSensor(SensorEntity):
@@ -148,7 +148,7 @@ class CorreiosSensor(SensorEntity):
 
                 self._image = icons["default"]
 
-                if 'status' in data:
+                if data != None and 'status' in data:
                     self._state = data["status"]
                     self.data_movimentacao = f'{data["data"]} às {data["hora"]}'
 
@@ -160,6 +160,8 @@ class CorreiosSensor(SensorEntity):
 
                     if data["status"] in icons:
                         self._image = icons[data["status"]]
+                else:
+                    self._state = 'Objeto não encontrado'
 
         except Exception as error:
             _LOGGER.error("ERRO - Não foi possível atualizar - %s", error)
