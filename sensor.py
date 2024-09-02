@@ -28,16 +28,46 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 icons = {
-    "Objeto postado": "/local/icons/agencia.png",
-    "Objeto postado após o horário limite da unidade": "/local/icons/agencia.png",
-    "Objeto em transferência - por favor aguarde": "/local/icons/caminhao.png",
-    "Sua entrega ou retirada nos Correios pode levar mais tempo do que o previsto": "/local/icons/precos_e_prazos.png",
-    "Objeto saiu para entrega ao destinatário": "/local/icons/saiu_para_entrega.png",
-    "Objeto entregue ao destinatário": "/local/icons/entregue.png",
-    "Objeto aguardando retirada no endereço indicado": "/local/icons/agencia.png",
-    "Objeto não entregue - prazo de retirada encerrado": "/local/icons/restricao.png",
-    "Informações enviadas para análise da autoridade aduaneira/órgãos anuentes": "/local/icons/contrato.png",
-    "default": "/local/icons/pacote_lupa.png"
+    "Objeto postado": {
+        "icon": "mdi:store-outline",
+        "color": "green"
+    },
+    "Objeto postado após o horário limite da unidade": {
+        "icon": "mdi:store-clock-outline",
+        "color": "green"
+    },
+    "Objeto em transferência - por favor aguarde": {
+        "icon": "mdi:truck-fast-outline",
+        "color": "blue"
+    },
+    "Sua entrega ou retirada nos Correios pode levar mais tempo do que o previsto": {
+        "icon": "mdi:clock-alert-outline",
+        "color": "yellow"
+    },
+    "Objeto saiu para entrega ao destinatário": {
+        "icon": "mdi:truck-check-outline",
+        "color": "green"
+    },
+    "Objeto entregue ao destinatário": {
+        "icon": "mdi:package-variant-closed-check",
+        "color": "purple"
+    },
+    "Objeto aguardando retirada no endereço indicado": {
+        "icon": "mdi:package-variant-closed-minus",
+        "color": "yellow"
+    },
+    "Objeto não entregue - prazo de retirada encerrado": {
+        "icon": "mdi:package-variant-closed-remove",
+        "color": "red"
+    },
+    "Informações enviadas para análise da autoridade aduaneira/órgãos anuentes": {
+        "icon": "mdi:file-arrow-up-down-outline",
+        "color": "blue"
+    },
+    "default": {
+        "icon": "mdi:package-variant-closed",
+        "color": "orange"
+    }
 }
 
 
@@ -119,7 +149,8 @@ class CorreiosSensor(SensorEntity):
         self.track = track
         self._name = name
         self.description = description
-        self._image = None
+        self._icon = None
+        self._icon_color = None
         self.dtPrevista = None
         self.data_movimentacao = None
         self.origem = None
@@ -145,7 +176,7 @@ class CorreiosSensor(SensorEntity):
             async with async_timeout.timeout(3000):
                 data = await extrair_dados_correios(url, self.session)
 
-                self._image = icons["default"]
+                self._icon = icons["default"]["icon"]
 
                 if data != None and 'status' in data:
                     self._state = data["status"]
@@ -158,7 +189,8 @@ class CorreiosSensor(SensorEntity):
                         self.local = data["local"]
 
                     if data["status"] in icons:
-                        self._image = icons[data["status"]]
+                        self._icon = icons[data["status"]]["icon"]
+                        self._icon_color = icons[data["status"]]["color"]
                 else:
                     self._state = 'Objeto não encontrado'
 
@@ -170,8 +202,12 @@ class CorreiosSensor(SensorEntity):
         return self._name
 
     @property
+    def icon(self):
+        return self._icon
+    
+    @property
     def entity_picture(self):
-        return self._image
+        return self._icon_color
 
     @property
     def state(self):
