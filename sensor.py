@@ -23,7 +23,6 @@ from .const import (
     CONF_TRACKING,
     CONF_DESCRIPTION,
     DOMAIN,
-    ICON,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -177,10 +176,6 @@ class CorreiosSensor(SensorEntity):
     @property
     def state(self):
         return self._state
-
-    @property
-    def icon(self):
-        return ICON
 
     @property
     def extra_state_attributes(self):

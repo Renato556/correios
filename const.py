@@ -12,5 +12,4 @@ CONF_TRACKING = "track"
 CONF_DESCRIPTION = "description"
 DEFAULT_DESCRIPTION: Final = "Encomenda"
 
-ICON = "mdi:box-variant-closed"
 BASE_API = "https://www.linkcorreios.com.br/?id={}"
