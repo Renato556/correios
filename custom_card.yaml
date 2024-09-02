@@ -1,0 +1,91 @@
+type: vertical-stack
+cards:
+  - type: horizontal-stack
+    cards:
+      - type: custom:mushroom-template-card
+        primary: Adicionar ou remover
+        badge_icon: mdi:plus
+        secondary: Rastreamento dos correios
+        icon: mdi:package-variant-closed
+        fill_container: true
+        layout: horizontal
+        icon_color: orange
+        entity: text.correios_rastreio
+        tap_action:
+          action: navigate
+          navigation_path: /config/integrations/integration/correios
+  - type: custom:button-card
+    layout: icon_name
+    name: Objetos Cadastrados
+    icon: mdi:package-variant-closed
+    styles:
+      grid:
+        - grid-template-areas: '"n i"'
+        - grid-template-columns: 1fr 20%
+      icon:
+        - align-self: end
+        - color: var(--text-primary-color)
+        - height: 35px
+      card:
+        - padding: 4px
+        - height: 40px
+        - background: var(--primary-color)
+      name:
+        - color: var(--text-primary-color)
+        - justify-self: start
+        - padding-left: 10%
+        - font-weight: 400
+        - font-size: 18px
+  - type: custom:auto-entities
+    card:
+      type: grid
+      columns: 1
+      square: false
+    card_param: cards
+    show_empty: false
+    filter:
+      include:
+        - entity_id: sensor.*br
+          options:
+            type: custom:mushroom-template-card
+            card_mod:
+              style: |
+                ha-card { 
+                  --ha-card-background: black;
+                  color: white;
+                }
+            entity: this.entity_id
+            primary: '{{ state_attr(''this.entity_id'', ''friendly_name'') }}'
+            secondary: >-
+              {{ states('this.entity_id') }}
+
+              {% if state_attr('this.entity_id', 'Origem') != None %}Origem: {{
+              state_attr('this.entity_id', 'Origem') }}
+
+              {% endif -%}
+
+              {% if state_attr('this.entity_id', 'Destino') != None %}Destino:
+              {{ state_attr('this.entity_id', 'Destino') }}
+
+              {% endif -%}
+
+              {% if state_attr('this.entity_id', 'Local') != None %}Local: {{
+              state_attr('this.entity_id', 'Local') }}
+
+              {% endif -%}
+
+              {% if state_attr('this.entity_id', 'Última Movimentação') != None
+              %}{{ state_attr('this.entity_id', 'Última Movimentação') }}
+
+              {% endif -%}
+            multiline_secondary: true
+            icon: '{{ state_attr(''this.entity_id'', ''icon'') }}'
+            icon_color: '{{ state_attr(''this.entity_id'', ''entity_picture'') }}'
+            tap_action:
+              action: more-info
+            order_by:
+              last_changed: asc
+    sort:
+      method: last_changed
+      count: 10
+      reverse: true`Texto pré-formatado`

@@ -12,13 +12,17 @@
     ```bash
     git clone https://github.com/Renato556/correios.git
 
-3. Copie os ícones:
-    ```bash
-    cd correios && cp -r icons /config/www
+3. Reinicie o Home Assistant
 
-4. Reinicie o Home Assistant
+4. A integração dos Correios estará disponível na seção "Integrações" do seu Home Assistant
 
-5. A integração dos Correios estará disponível na seção "Integrações" do seu Home Assistant
+5. Adicione o custom_card no seu dashboard. Dependências:
+    - HACS
+    - Mushroom
+    - Config Template Card
+    - button-card
+    - auto-entities
+    - more-info-card
 
 ## Contribua com este projeto!
 Se você possui novos ícones ou informações sobre status de encomendas, sinta-se à vontade para contribuir com este repositório. Suas contribuições serão muito bem-vindas!
