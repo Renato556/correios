@@ -106,8 +106,9 @@ async def extrair_dados_correios(url, session):
                     destino = linha_status.find_all('li')[3].text.strip()
                     dados['origem'] = origem
                     dados['destino'] = destino
+                    dados['local'] = None
                 else:
-                    local = linha_status.find_all('li')[2].text.strip().replace('Local: ', '')
+                    local = linha_status.find_all('li')[2].text.strip()
                     dados['local'] = local
                 
                 data_hora = linha_status.find_all('li')[1].text.strip()
@@ -180,7 +181,7 @@ class CorreiosSensor(SensorEntity):
 
                 if data != None and 'status' in data:
                     self._state = data["status"]
-                    self.data_movimentacao = f'{data["data"]} às {data["hora"]}'
+                    self.data_movimentacao = f'Última movimentação: {data["data"]} às {data["hora"]}'
 
                     if 'origem' in data:
                         self.origem = data["origem"]
