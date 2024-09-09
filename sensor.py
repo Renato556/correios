@@ -152,11 +152,10 @@ class CorreiosSensor(SensorEntity):
         self.description = description
         self._icon = None
         self._icon_color = None
-        self.dtPrevista = None
         self.data_movimentacao = None
-        self.origem = None
-        self.destino = None
-        self.local = None
+        self.origem = 0
+        self.destino = 0
+        self.local = 0
         self._state = None
         self._attr_unique_id = track
 
@@ -181,13 +180,13 @@ class CorreiosSensor(SensorEntity):
 
                 if data != None and 'status' in data:
                     self._state = data["status"]
-                    self.data_movimentacao = f'Última movimentação: {data["data"]} às {data["hora"]}'
+                    self.data_movimentacao = f'{data["data"]} às {data["hora"]}'
 
                     if 'origem' in data:
-                        self.origem = data["origem"]
-                        self.destino = data["destino"]
+                        self.origem = data["origem"].replace("Origem: ", "")
+                        self.destino = data["destino"].replace("Destino: ", "")
                     else:
-                        self.local = data["local"]
+                        self.local = data["local"].replace("Local: ", "")
 
                     if data["status"] in icons:
                         self._icon = icons[data["status"]]["icon"]

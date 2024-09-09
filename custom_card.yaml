@@ -37,23 +37,24 @@ cards:
             secondary: >-
               {{ states('this.entity_id') }}
 
-              {% if state_attr('this.entity_id', 'Origem') != None %}{{
+              {% if state_attr('this.entity_id', 'Origem') != 0 %}Origem: {{
               state_attr('this.entity_id', 'Origem') }}
 
               {% endif -%}
 
-              {% if state_attr('this.entity_id', 'Destino') != None %}{{ 
-              state_attr('this.entity_id', 'Destino') }}
+              {% if state_attr('this.entity_id', 'Destino') != 0 %}Destino:
+              {{ state_attr('this.entity_id', 'Destino') }}
 
               {% endif -%}
 
-              {% if state_attr('this.entity_id', 'Local') != None %}{{
-              state_attr('this.entity_id', 'Local') }}
+              {% if state_attr('this.entity_id', 'Local') != 0 %}Local:
+              {{state_attr('this.entity_id', 'Local') }}
 
               {% endif -%}
 
               {% if state_attr('this.entity_id', 'Última Movimentação') != None
-              %}{{ state_attr('this.entity_id', 'Última Movimentação') }}
+              %}Última movimentação: {{ state_attr('this.entity_id', 'Última
+              Movimentação') }}
 
               {% endif -%}
             multiline_secondary: true
